@@ -31,7 +31,7 @@ class ApiService {
     final refreshToken = prefs.getString('refresh_token');
 
     final response = await http.post(
-      Uri.parse('$baseUrl/auth/insecure/refreshToken'), // Cambia esto a tu endpoint de refresco
+      Uri.parse('$baseUrl/auth/insecure/refreshToken'),
       headers: {
         'Content-Type': 'application/json',
       },
@@ -40,8 +40,13 @@ class ApiService {
 
     if (response.statusCode == 200) {
       final data = jsonDecode(response.body);
-      await prefs.setString('token', data['token']['access_token']); // Guarda el token
-      await prefs.setString('refresh_token', data['token']['refresh_token']); // Almacena el nuevo token
+      final int status = data['status'];
+      if(status == 0){
+        await prefs.setString('token', data['token']['access_token']);
+        await prefs.setString('refresh_token', data['token']['refresh_token']); 
+      } else {
+        logout();
+      }
     } else {
       logout();
     }
@@ -49,6 +54,7 @@ class ApiService {
 
   Future<http.Response> get(String endpoint) async {
     if (!await isTokenValid()) {
+      print("Aqui please");
       await _refreshToken(); // Intenta refrescar el token
     }
 
@@ -62,7 +68,6 @@ class ApiService {
         'Content-Type': 'application/json',
       },
     );
-
     // Si el token es inválido, intenta refrescarlo
     if (response.statusCode == 401) {
       await _refreshToken();
@@ -120,6 +125,7 @@ class ApiService {
         throw LoginException('El usuario no esta autorizado');
       }
       await prefs.setInt('user', data['user']['id']);
+      await prefs.setInt('city', data['user']['dependency']);
       await prefs.setString('token', data['token']['access_token']); // Guarda el token
       await prefs.setString('refresh_token', data['token']['refresh_token']); // Guarda el refresh token
     }

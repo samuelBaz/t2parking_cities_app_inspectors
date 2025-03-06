@@ -1,0 +1,4 @@
+enum TicketStatus {
+  OK,
+  ERROR
+} 

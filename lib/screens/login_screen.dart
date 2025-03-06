@@ -34,8 +34,8 @@ class _LoginScreenState extends State<LoginScreen> {
     if (isValid) {
       context.go('/home');
     } else {
-      // El token es válido
-      print('Token activo: $isValid');
+      // El token es inválido
+      print('Token invalido: $isValid');
     }
   }
 
@@ -52,7 +52,7 @@ class _LoginScreenState extends State<LoginScreen> {
               width: double.infinity,
               child: Center(
                 child: Text(
-                  'Login to your Account',
+                  'Inicia Sesión en tu Cuenta',
                   textAlign: TextAlign.left,
                   style: Theme.of(context).textTheme.titleLarge,
                 ),
@@ -175,16 +175,16 @@ class _LoginScreenState extends State<LoginScreen> {
                       _handleLogin();
                     }
                   ),
-                  SizedBox(height: 24.0),
-                  GestureDetector(
-                    onTap: () {},
-                    child: Text(
-                      "Olvidaste tu contraseña?",
-                      style: Theme.of(context).textTheme.bodyMedium!.copyWith(
-                        color: AppColors.primaryColor,
-                      ),
-                    ),
-                  ),
+                  // SizedBox(height: 24.0),
+                  // GestureDetector(
+                  //   onTap: () {},
+                  //   child: Text(
+                  //     "Olvidaste tu contraseña?",
+                  //     style: Theme.of(context).textTheme.bodyMedium!.copyWith(
+                  //       color: AppColors.primaryColor,
+                  //     ),
+                  //   ),
+                  // ),
                   SizedBox(height: 24.0),
                   if (_isLoading)
                     Center(

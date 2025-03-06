@@ -33,7 +33,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   Future<void> _getUserPreference() async {
     final prefs = await SharedPreferences.getInstance();
-    final user = prefs.getInt('user'); // Obtiene la preferencia 'user'
+    final user = prefs.getInt('user');
 
     if (user != null) {
       inspectorId = user;
@@ -48,7 +48,7 @@ class _HomeScreenState extends State<HomeScreen> {
         textColor: Colors.white,
         fontSize: 16.0,
       );
-      context.go('/login');
+      apiService.logout();
     }
   }
 
@@ -62,7 +62,7 @@ class _HomeScreenState extends State<HomeScreen> {
       });
     } catch (e) {
       print('Error al obtener eventos: $e');
-      apiService.logout();
+      // apiService.logout();
     }
   }
 
@@ -78,8 +78,27 @@ class _HomeScreenState extends State<HomeScreen> {
         ),
         bottomOpacity: 0.5,
         actions: [
-          IconButton(onPressed: () {}, icon: Icon(Icons.check_circle)),
-          IconButton(onPressed: () {}, icon: Icon(Icons.more_vert)),
+          IconButton(onPressed: () {
+            context.push('/consult');
+          }, icon: Icon(Icons.check_circle)),
+          PopupMenuButton<String>(
+            onSelected: (value) {
+              if(value == "EXIT"){
+                apiService.logout();
+              }
+            },
+            offset: Offset(0, 50),
+            menuPadding: EdgeInsets.symmetric(horizontal: 16),
+            itemBuilder: (BuildContext context) {
+              return [
+                PopupMenuItem<String>(
+                  value: 'EXIT',
+                  child: Text('Cerrar Sesión'),
+
+                ),
+              ];
+            },
+          ),
         ],
       ),
       body: SafeArea(
@@ -123,7 +142,7 @@ class _HomeScreenState extends State<HomeScreen> {
                               Expanded(
                                 flex: 6, // 60% del espacio
                                 child: Container(
-                                  // Color de fondo para visualizar el espacio
+                                  margin: EdgeInsets.only(right: 4),
                                   child: Column(
                                     crossAxisAlignment:
                                         CrossAxisAlignment.start,
