@@ -15,7 +15,7 @@ class LicensePlate extends StatelessWidget {
         border: Border.all(
           // Define el borde
           color: Colors.black, // Color del borde
-          width: 2.0, // Ancho del borde
+          width: 1.0, // Ancho del borde
         ),
       ),
       child: Column(
@@ -25,7 +25,7 @@ class LicensePlate extends StatelessWidget {
             color: Colors.blue[800],
             alignment: Alignment.center,
             child: Text(
-              "MATRICULA",
+              "MATRÍCULA",
               style: TextStyle(fontSize: 10, color: Colors.white),
             ),
           ),

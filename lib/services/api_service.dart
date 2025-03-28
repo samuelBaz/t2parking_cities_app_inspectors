@@ -54,7 +54,6 @@ class ApiService {
 
   Future<http.Response> get(String endpoint) async {
     if (!await isTokenValid()) {
-      print("Aqui please");
       await _refreshToken(); // Intenta refrescar el token
     }
 

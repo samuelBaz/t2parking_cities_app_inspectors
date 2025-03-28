@@ -19,8 +19,11 @@ final GoRouter appRouter = GoRouter(
       builder: (context, state) => HomeScreen(),
     ),
     GoRoute(
-      path: '/consult',
-      builder: (context, state) => ConsultScreen(),
+      path: '/consult/:id',
+      builder: (context, state) {
+        final String id = state.pathParameters['id']?? 'NEW';
+        return ConsultScreen(id: id);
+      },
     ),
   ],
 ); 

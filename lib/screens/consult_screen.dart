@@ -5,13 +5,18 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:go_router/go_router.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:t2parking_cities_inspector_app/constants/colors.dart';
-import 'package:t2parking_cities_inspector_app/models/ticket.dart';
+import 'package:t2parking_cities_inspector_app/models/inspector_events.dart';
 import 'package:t2parking_cities_inspector_app/services/api_service.dart';
 import 'package:t2parking_cities_inspector_app/utils/string_utils.dart';
+import 'package:t2parking_cities_inspector_app/widgets/license_plate.dart';
 import 'package:t2parking_cities_inspector_app/widgets/tc_button.dart';
+import 'package:t2parking_cities_inspector_app/widgets/tc_ticket.dart';
+import 'package:flutter/services.dart';
 
 class ConsultScreen extends StatefulWidget {
-  const ConsultScreen({Key? key}) : super(key: key);
+  final String id;
+
+  const ConsultScreen({Key? key, required this.id}) : super(key: key);
 
   @override
   _ConsultScreenState createState() => _ConsultScreenState();
@@ -24,14 +29,22 @@ class _ConsultScreenState extends State<ConsultScreen> {
   late final int inspectorId;
   late final int cityId;
   late final ApiService apiService;
-  String messageResult = "Introduce una matricula para ver sus tickets.";
-  List<Ticket> tickets = [];
+  String messageResult = "Introduce una matrícula para ver sus tickets.";
+  InspectorEvent? event;
+  late final TextEditingController _matriculaController;
 
   @override
   void initState() {
     super.initState();
     _getPrefences();
     apiService = ApiService(context: context);
+    _matriculaController = TextEditingController();
+
+    if(widget.id != 'NEW'){
+      _getEventSeleted(widget.id);
+    }
+    
+    _matriculaController.text = "";
   }
 
   void _getPrefences() async {
@@ -50,6 +63,7 @@ class _ConsultScreenState extends State<ConsultScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.white,
       appBar: AppBar(
         title: Text(
           'Consultar',
@@ -95,7 +109,7 @@ class _ConsultScreenState extends State<ConsultScreen> {
                             color: Colors.blue[800],
                             alignment: Alignment.center,
                             child: Text(
-                              "MATRICULA",
+                              "MATRÍCULA",
                               style: TextStyle(
                                 fontSize: 14,
                                 color: Colors.white,
@@ -103,6 +117,7 @@ class _ConsultScreenState extends State<ConsultScreen> {
                             ),
                           ),
                           TextFormField(
+                            controller: _matriculaController,
                             textAlign: TextAlign.center,
                             style: TextStyle(fontSize: 26),
                             textCapitalization: TextCapitalization.characters,
@@ -116,21 +131,23 @@ class _ConsultScreenState extends State<ConsultScreen> {
                               alignLabelWithHint: false,
                               focusedBorder: InputBorder.none,
                             ),
+                            inputFormatters: [
+                              FilteringTextInputFormatter.allow(RegExp(r'^[a-zA-Z0-9]*$')),
+                            ],
                             validator: (value) {
                               if (value == null || value.isEmpty) {
-                                return 'Por favor ingresa tu matrícula';
+                                return 'Ingresa tu matrícula';
                               }
                               return null;
                             },
                             onSaved: (value) {
-                              _matricula =
-                                  value
-                                      ?.toUpperCase();
-                              
-                              if(value!.isEmpty) {
+                              _matricula = _matriculaController.text.toUpperCase();
+
+                              if (_matricula!.isEmpty) {
                                 setState(() {
-                                  tickets = [];
-                                  messageResult = "Introduce una matricula para ver sus tickets.";
+                                  event = null;
+                                  messageResult =
+                                      "Introduce una matrícula para ver sus tickets.";
                                 });
                               }
                             },
@@ -148,10 +165,170 @@ class _ConsultScreenState extends State<ConsultScreen> {
                       _handleConsult();
                     },
                   ),
-                  SizedBox(height: 24),
+                  SizedBox(height: 16),
+                  _isLoading || event == null ? SizedBox():
+                  Container(
+                          margin: EdgeInsets.symmetric(
+                            vertical: 6,
+                            horizontal: 1,
+                          ),
+                          padding: EdgeInsets.all(8),
+                          decoration: BoxDecoration(
+                            color: Colors.white, // Color de fondo del ticket
+                            borderRadius: BorderRadius.circular(
+                              8.0,
+                            ), // Bordes redondeados
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.grey.withOpacity(
+                                  0.5,
+                                ), // Sombra del ticket
+                                spreadRadius: 1,
+                                blurRadius: 3,
+                                offset: Offset(
+                                  0,
+                                  1,
+                                ), // Cambia la posición de la sombra
+                              ),
+                            ],
+                          ),
+                          child: Column(
+                            children: [
+                              Row(
+                                children: [
+                                  Expanded(
+                                    flex: 6, // 60% del espacio
+                                    child: Container(
+                                      margin: EdgeInsets.only(right: 4),
+                                      child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          Row(
+                                            children: [
+                                              Text(
+                                                'Fecha inspección: ',
+                                                textAlign: TextAlign.start,
+                                                style: Theme.of(
+                                                  context,
+                                                ).textTheme.bodySmall!.copyWith(
+                                                  color: Colors.black54,
+                                                  fontWeight: FontWeight.w400,
+                                                  fontSize: 12,
+                                                ),
+                                              ),
+                                              Text(
+                                                formatUtcToLocal(
+                                                  event!.createdAt,
+                                                ),
+                                                textAlign: TextAlign.start,
+                                                style: Theme.of(
+                                                  context,
+                                                ).textTheme.bodySmall!.copyWith(
+                                                  fontWeight: FontWeight.w200,
+                                                  fontSize: 11,
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                          SizedBox(height: 2),
+                                          Row(
+                                            children: [
+                                              Text(
+                                                'Resultado: ',
+                                                textAlign: TextAlign.start,
+                                                style: Theme.of(
+                                                  context,
+                                                ).textTheme.bodySmall!.copyWith(
+                                                  color: Colors.black54,
+                                                  fontWeight: FontWeight.w400,
+                                                  fontSize: 12,
+                                                ),
+                                              ),
+                                              Container(
+                                                padding: EdgeInsets.symmetric(
+                                                  vertical: 2,
+                                                ),
+                                                child: Row(
+                                                  mainAxisAlignment:
+                                                      MainAxisAlignment.center,
+                                                  children: [
+                                                    Icon(
+                                                      event!.status == "EXPIRED"
+                                                          ? Icons
+                                                              .watch_later_outlined
+                                                          : event!.status ==
+                                                              'ACTIVE'
+                                                          ? Icons
+                                                              .check_circle_outline
+                                                          : Icons
+                                                              .warning_amber_rounded, // Ícono de advertencia
+                                                      color:
+                                                          event!.status ==
+                                                                  "EXPIRED"
+                                                              ? Colors
+                                                                  .yellow
+                                                                  .shade900
+                                                              : event!.status ==
+                                                                  'ACTIVE'
+                                                              ? Colors
+                                                                  .green
+                                                                  .shade900
+                                                              : Colors
+                                                                  .red
+                                                                  .shade900, // Color del ícono
+                                                      size:
+                                                          21.0, // Tamaño del ícono
+                                                    ),
+                                                    SizedBox(width: 4),
+                                                    Text(
+                                                      event!.status == 'ACTIVE'
+                                                          ? 'CON TICKET ACTIVO'
+                                                          : event!.status ==
+                                                              'EXPIRED'
+                                                          ? 'CON TICKET VENCIDO'
+                                                          : 'SIN TICKET',
+                                                      style: TextStyle(
+                                                        fontWeight:
+                                                            FontWeight.bold,
+                                                        fontSize: 12,
+                                                        color: event!.status ==
+                                                                  "EXPIRED"
+                                                              ? Colors
+                                                                  .yellow
+                                                                  .shade900
+                                                              : event!.status ==
+                                                                  'ACTIVE'
+                                                              ? Colors
+                                                                  .green
+                                                                  .shade900
+                                                              : Colors
+                                                                  .red
+                                                                  .shade900, 
+                                                      ),
+                                                    ),
+                                                  ],
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                                  Expanded(
+                                    flex: 3, // 30% del espacio
+                                    child: LicensePlate(plate: event!.plate),
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
+                        ),
+                  SizedBox(height: 16),
                   _isLoading
                       ? CircularProgressIndicator()
-                      : tickets.isEmpty
+                      : event != null && event?.tickets!.length == 0
                       ? Container(
                         width: double.infinity,
                         padding: EdgeInsets.all(8),
@@ -182,138 +359,17 @@ class _ConsultScreenState extends State<ConsultScreen> {
                           ],
                         ),
                       )
-                      : ListView.builder(
+                      : event != null
+                      ? ListView.builder(
                         shrinkWrap: true,
                         physics: NeverScrollableScrollPhysics(),
-                        itemCount: tickets.length,
+                        itemCount: event!.tickets?.length,
                         itemBuilder: (context, index) {
-                          final ticket = tickets[index];
-                          return Container(
-                            margin: EdgeInsets.symmetric(vertical: 8),
-                            padding: EdgeInsets.all(16),
-                            decoration: BoxDecoration(
-                              color: Colors.white,
-                              borderRadius: BorderRadius.circular(8),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: Colors.grey.withOpacity(0.2),
-                                  spreadRadius: 2,
-                                  blurRadius: 6,
-                                  offset: Offset(0, 4),
-                                ),
-                              ],
-                            ),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                ClipPath(
-                                  clipper: TriangleClipper(),
-                                  child: Container(
-                                    height: 16,
-                                    width:
-                                        MediaQuery.of(
-                                          context,
-                                        ).size.width, // Ancho del triángulo
-                                    color:
-                                        AppColors
-                                            .secondaryColor, // Color del triángulo
-                                  ),
-                                ),
-                                SizedBox(height: 16),
-                                Center(
-                                  child: Image.asset(
-                                    'images/logo.png',
-                                    width: 200,
-                                  ),
-                                ),
-                                Container(
-                                  margin: EdgeInsets.only(top: 16, bottom: 8),
-                                  color: Colors.black,
-                                  height: 2,
-                                  width: double.infinity,
-                                ),
-                                Center(
-                                  child: Text(
-                                    'TICKET DE ESTACIONAMIENTO',
-                                    style: TextStyle(
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
-                                ),
-                                Container(
-                                  margin: EdgeInsets.only(top: 8, bottom: 8),
-                                  color: Colors.black,
-                                  height: 2,
-                                  width: double.infinity,
-                                ),
-                                Row(
-                                  children: [
-                                    Expanded(
-                                      flex: 4,
-                                      child: Column(
-                                        children: [
-                                          Row(
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.end,
-                                            children: [
-                                              Icon(Icons.arrow_right_alt_sharp),
-                                              Text('Desde : '),
-                                            ],
-                                          ),
-                                          Row(
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.end,
-                                            children: [Text('Hasta : ')],
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                    Expanded(
-                                      flex: 6,
-                                      child: Column(
-                                        children: [
-                                          Row(
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.start,
-                                            children: [Text(formatUtcToLocal(ticket.startDate.toString()))],
-                                          ),
-                                          Row(
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.start,
-                                            children: [Text(formatUtcToLocal(ticket.endDate.toString())), Icon(Icons.arrow_right_alt),],
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                                SizedBox(height: 8,),
-                                Center(child: Text('MONTO : ${ticket.amount}', style: TextStyle(fontSize: 26, fontWeight: FontWeight.w900),)),
-
-                                Container(
-                                  margin: EdgeInsets.only(top: 8, bottom: 16),
-                                  color: Colors.black,
-                                  height: 2,
-                                  width: double.infinity,
-                                ),
-                                ClipPath(
-                                  clipper: TriangleClipper(),
-                                  child: Container(
-                                    height: 16,
-                                    width:
-                                        MediaQuery.of(
-                                          context,
-                                        ).size.width, // Ancho del triángulo
-                                    color:
-                                        AppColors
-                                            .secondaryColor, // Color del triángulo
-                                  ),
-                                ),
-                              ],
-                            ),
-                          );
+                          final ticket = event!.tickets?[index];
+                          return TCTicket(ticket: ticket!);
                         },
-                      ),
+                      )
+                      : SizedBox(),
                 ],
               ),
             ),
@@ -331,23 +387,21 @@ class _ConsultScreenState extends State<ConsultScreen> {
       });
       try {
         final response = await apiService.get(
-          '/api/tickets/getTodayTicketsByCity/$cityId/ByPlate/$_matricula/ByInspector/$inspectorId',
+          '/api/inspector_events/inspect?plate=$_matricula&userId=$inspectorId',
         );
 
         if (response.statusCode == 200) {
           final data = jsonDecode(response.body);
-          List<dynamic> content = data['data']['content'];
-          tickets =
-              content
-                  .map((ticketJson) => Ticket.fromJson(ticketJson))
-                  .toList(); // Parsear a lista de Tickets
-          if (tickets.length == 0) {
+          Map<String, dynamic> content = data['data'];
+          event = InspectorEvent.fromJson(content);
+
+          if (event!.tickets!.length == 0) {
             setState(() {
               messageResult =
-                  "La matrícula: $_matricula no tiene ningún ticket para el día de hoy.";
+                  "La matrícula $_matricula no tiene ningún ticket para el día de hoy.";
             });
           }
-          print(tickets); // Imprimir la lista de tickets
+
         } else {
           Fluttertoast.showToast(
             msg: 'Error de consulta: ${response.statusCode} ${response.body}',
@@ -369,7 +423,7 @@ class _ConsultScreenState extends State<ConsultScreen> {
           textColor: Colors.white,
           fontSize: 16.0,
         );
-        tickets = [];
+        // tickets = [];
       } finally {
         setState(() {
           _isLoading = false;
@@ -377,21 +431,56 @@ class _ConsultScreenState extends State<ConsultScreen> {
       }
     }
   }
-}
 
-class TriangleClipper extends CustomClipper<Path> {
-  @override
-  Path getClip(Size size) {
-    Path path = Path();
-    path.moveTo(size.width / 2, 0); // Punto superior central (pico)
-    path.lineTo(size.width, size.height); // Punto inferior derecho
-    path.lineTo(0, size.height); // Punto inferior izquierdo
-    path.close();
-    return path;
-  }
+  void _getEventSeleted(String eventId) async {
+    // if (_formKey.currentState!.validate()) {
+      // _formKey.currentState!.save();
+      setState(() {
+        _isLoading = true;
+      });
+      try {
+        final response = await apiService.get(
+          '/api/inspector_events/inspect/$eventId',
+        );
 
-  @override
-  bool shouldReclip(CustomClipper<Path> oldClipper) {
-    return false;
+        if (response.statusCode == 200) {
+          final data = jsonDecode(response.body);
+          Map<String, dynamic> content = data['data'];
+          event = InspectorEvent.fromJson(content);
+          _matriculaController.text = event!.plate;
+          if (event!.tickets!.length == 0) {
+            setState(() {
+              messageResult =
+                  "La matrícula ${event!.plate} no tiene ningún ticket para el día de hoy.";
+            });
+          }
+        } else {
+          Fluttertoast.showToast(
+            msg: 'Error de consulta: ${response.statusCode} ${response.body}',
+            toastLength: Toast.LENGTH_SHORT,
+            gravity: ToastGravity.BOTTOM,
+            timeInSecForIosWeb: 1,
+            backgroundColor: Colors.red,
+            textColor: Colors.white,
+            fontSize: 16.0,
+          );
+        }
+      } catch (e) {
+        Fluttertoast.showToast(
+          msg: 'Error: $e',
+          toastLength: Toast.LENGTH_SHORT,
+          gravity: ToastGravity.BOTTOM,
+          timeInSecForIosWeb: 1,
+          backgroundColor: Colors.red,
+          textColor: Colors.white,
+          fontSize: 16.0,
+        );
+        // tickets = [];
+      } finally {
+        setState(() {
+          _isLoading = false;
+        });
+      }
+    // }
   }
 }

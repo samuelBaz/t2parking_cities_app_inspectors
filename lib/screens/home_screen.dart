@@ -82,12 +82,6 @@ class _HomeScreenState extends State<HomeScreen> {
         ),
         bottomOpacity: 0.5,
         actions: [
-          IconButton(
-            onPressed: () {
-              context.push('/consult');
-            },
-            icon: Icon(Icons.check_circle),
-          ),
           PopupMenuButton<String>(
             onSelected: (value) {
               if (value == "EXIT") {
@@ -116,37 +110,77 @@ class _HomeScreenState extends State<HomeScreen> {
                     child: CircularProgressIndicator(),
                   ) // Muestra un indicador de carga
                   : events.isEmpty
-                  ? Container(
-                    width: double.infinity,
-                    padding: EdgeInsets.all(8),
-                    margin: EdgeInsets.only(top: 16),
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(8),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.grey.withOpacity(0.2),
-                          spreadRadius: 2,
-                          blurRadius: 5,
-                          offset: Offset(0, 3),
+                  ? Column(
+                    children: [
+                      Container(
+                        width: double.infinity,
+                        padding: EdgeInsets.all(8),
+                        margin: EdgeInsets.only(top: 16),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(8),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.grey.withOpacity(0.2),
+                              spreadRadius: 2,
+                              blurRadius: 5,
+                              offset: Offset(0, 3),
+                            ),
+                          ],
                         ),
-                      ],
-                    ),
-                    child: Row(
-                      children: [
-                        Icon(Icons.info, color: Colors.blueAccent),
-                        SizedBox(width: 8),
-                        Expanded(
-                          child: Text(
-                            'Sin historial de consultas recientes...',
-                            style: Theme.of(
-                              context,
-                            ).textTheme.bodySmall!.copyWith(color: Colors.blue),
-                            softWrap: true,
+                        child: Row(
+                          children: [
+                            Icon(Icons.info, color: Colors.blueAccent),
+                            SizedBox(width: 8),
+                            Expanded(
+                              child: Text(
+                                'Sin historial de consultas recientes...',
+                                style: Theme.of(context).textTheme.bodySmall!
+                                    .copyWith(color: Colors.blue),
+                                softWrap: true,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+
+                      GestureDetector(
+                        onTap: () => _fetchInspectorEvents(),
+                        child: Container(
+                          width: double.infinity,
+                          padding: EdgeInsets.all(8),
+                          margin: EdgeInsets.only(top: 16),
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(8),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.grey.withOpacity(0.2),
+                                spreadRadius: 2,
+                                blurRadius: 5,
+                                offset: Offset(0, 3),
+                              ),
+                            ],
+                          ),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Icon(
+                                Icons.refresh_outlined,
+                                color: AppColors.primaryColor,
+                              ),
+                              SizedBox(width: 8),
+                              Text(
+                                'Actualizar',
+                                style: Theme.of(context).textTheme.bodySmall!
+                                    .copyWith(color: AppColors.primaryColor),
+                                softWrap: true,
+                              ),
+                            ],
                           ),
                         ),
-                      ],
-                    ),
+                      ),
+                    ],
                   )
                   : RefreshIndicator(
                     onRefresh: _fetchInspectorEvents,
@@ -154,217 +188,228 @@ class _HomeScreenState extends State<HomeScreen> {
                       itemCount: events.length,
                       itemBuilder: (context, index) {
                         final event = events[index];
-                        return Container(
-                          margin: EdgeInsets.symmetric(
-                            vertical: 6,
-                            horizontal: 1,
-                          ),
-                          padding: EdgeInsets.all(8),
-                          decoration: BoxDecoration(
-                            color: Colors.white, // Color de fondo del ticket
-                            borderRadius: BorderRadius.circular(
-                              8.0,
-                            ), // Bordes redondeados
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.grey.withOpacity(
-                                  0.5,
-                                ), // Sombra del ticket
-                                spreadRadius: 1,
-                                blurRadius: 3,
-                                offset: Offset(
-                                  0,
-                                  1,
-                                ), // Cambia la posición de la sombra
-                              ),
-                            ],
-                          ),
-                          child: Column(
-                            children: [
-                              Row(
-                                children: [
-                                  Expanded(
-                                    flex: 6, // 60% del espacio
-                                    child: Container(
-                                      margin: EdgeInsets.only(right: 4),
-                                      child: Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        children: [
-                                          Row(
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.end,
-                                            children: [
-                                              // Icon(
-                                              //   event.typeEvent == "PENALIZE"
-                                              //       ? Icons.warning_rounded
-                                              //       : Icons
-                                              //           .car_crash_rounded, // Ícono de advertencia
-                                              //   color:
-                                              //       event.typeEvent == "PENALIZE"
-                                              //           ? Colors.red
-                                              //           : Colors
-                                              //               .blueAccent, // Color del ícono
-                                              //   size: 30.0, // Tamaño del ícono
-                                              // ),
-                                              // SizedBox(width: 8),
-                                              Container(
-                                                decoration: BoxDecoration(
-                                                  color:
-                                                      Colors
-                                                          .blue[700], // Color de fondo del ticket
-                                                  borderRadius:
-                                                      BorderRadius.circular(
-                                                        12.0,
-                                                      ), // Bordes redondeados
-                                                  boxShadow: [
-                                                    BoxShadow(
-                                                      color: Colors.grey
-                                                          .withOpacity(
-                                                            0.5,
-                                                          ), // Sombra del ticket
-                                                      spreadRadius: 1,
-                                                      blurRadius: 3,
-                                                      offset: Offset(
-                                                        0,
-                                                        1,
-                                                      ), // Cambia la posición de la sombra
-                                                    ),
-                                                  ],
-                                                ),
-                                                padding: EdgeInsets.symmetric(
-                                                  vertical: 2,
-                                                  horizontal: 8,
-                                                ),
-                                                child: Text(
-                                                  event.typeEvent == "PENALIZE"
-                                                      ? "MULTA"
-                                                      : "CONSULTA",
-                                                  style: TextStyle(
+                        return GestureDetector(
+                          onTap: () {
+                            context.push('/consult/${event.id}');
+                          },
+                          child: Container(
+                            margin: EdgeInsets.symmetric(
+                              vertical: 6,
+                              horizontal: 1,
+                            ),
+                            padding: EdgeInsets.all(8),
+                            decoration: BoxDecoration(
+                              color: Colors.white, // Color de fondo del ticket
+                              borderRadius: BorderRadius.circular(
+                                8.0,
+                              ), // Bordes redondeados
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.grey.withOpacity(
+                                    0.5,
+                                  ), // Sombra del ticket
+                                  spreadRadius: 1,
+                                  blurRadius: 3,
+                                  offset: Offset(
+                                    0,
+                                    1,
+                                  ), // Cambia la posición de la sombra
+                                ),
+                              ],
+                            ),
+                            child: Column(
+                              children: [
+                                Row(
+                                  children: [
+                                    Expanded(
+                                      flex: 6, // 60% del espacio
+                                      child: Container(
+                                        margin: EdgeInsets.only(right: 4),
+                                        child: Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            Row(
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.end,
+                                              children: [
+                                                Container(
+                                                  decoration: BoxDecoration(
                                                     color:
-                                                        event.typeEvent ==
-                                                                "PENALIZE"
-                                                            ? Colors.red
-                                                            : Colors.white,
-                                                    fontWeight: FontWeight.bold,
-                                                    fontSize: 14,
+                                                        Colors
+                                                            .blue[700], // Color de fondo del ticket
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                          12.0,
+                                                        ), // Bordes redondeados
+                                                    boxShadow: [
+                                                      BoxShadow(
+                                                        color: Colors.grey
+                                                            .withOpacity(
+                                                              0.5,
+                                                            ), // Sombra del ticket
+                                                        spreadRadius: 1,
+                                                        blurRadius: 3,
+                                                        offset: Offset(
+                                                          0,
+                                                          1,
+                                                        ), // Cambia la posición de la sombra
+                                                      ),
+                                                    ],
+                                                  ),
+                                                  padding: EdgeInsets.symmetric(
+                                                    vertical: 2,
+                                                    horizontal: 8,
+                                                  ),
+                                                  child: Text(
+                                                    event.typeEvent ==
+                                                            "PENALIZE"
+                                                        ? "MULTA"
+                                                        : "CONSULTA",
+                                                    style: TextStyle(
+                                                      color:
+                                                          event.typeEvent ==
+                                                                  "PENALIZE"
+                                                              ? Colors.red
+                                                              : Colors.white,
+                                                      fontWeight:
+                                                          FontWeight.bold,
+                                                      fontSize: 12,
+                                                    ),
                                                   ),
                                                 ),
-                                              ),
-                                            ],
-                                          ),
-                                          SizedBox(height: 2),
-                                          Row(
-                                            children: [
-                                              Text(
-                                                'Fecha inspección: ',
-                                                textAlign: TextAlign.start,
-                                                style: Theme.of(
-                                                  context,
-                                                ).textTheme.bodySmall!.copyWith(
-                                                  color: Colors.black54,
-                                                  fontWeight: FontWeight.w400,
-                                                  fontSize: 12,
+                                              ],
+                                            ),
+                                            SizedBox(height: 2),
+                                            Row(
+                                              children: [
+                                                Text(
+                                                  'Fecha inspección: ',
+                                                  textAlign: TextAlign.start,
+                                                  style: Theme.of(context)
+                                                      .textTheme
+                                                      .bodySmall!
+                                                      .copyWith(
+                                                        color: Colors.black54,
+                                                        fontWeight:
+                                                            FontWeight.w400,
+                                                        fontSize: 12,
+                                                      ),
                                                 ),
-                                              ),
-                                              Text(
-                                                formatUtcToLocal(
-                                                  event.createdAt,
+                                                Text(
+                                                  formatUtcToLocal(
+                                                    event.createdAt,
+                                                  ),
+                                                  textAlign: TextAlign.start,
+                                                  style: Theme.of(context)
+                                                      .textTheme
+                                                      .bodySmall!
+                                                      .copyWith(
+                                                        fontWeight:
+                                                            FontWeight.w200,
+                                                        fontSize: 11,
+                                                      ),
                                                 ),
-                                                textAlign: TextAlign.start,
-                                                style: Theme.of(
-                                                  context,
-                                                ).textTheme.bodySmall!.copyWith(
-                                                  fontWeight: FontWeight.w200,
-                                                  fontSize: 11,
+                                              ],
+                                            ),
+                                            SizedBox(height: 2),
+                                            Row(
+                                              children: [
+                                                Text(
+                                                  'Resultado: ',
+                                                  textAlign: TextAlign.start,
+                                                  style: Theme.of(context)
+                                                      .textTheme
+                                                      .bodySmall!
+                                                      .copyWith(
+                                                        color: Colors.black54,
+                                                        fontWeight:
+                                                            FontWeight.w400,
+                                                        fontSize: 12,
+                                                      ),
                                                 ),
-                                              ),
-                                            ],
-                                          ),
-                                        ],
+                                                Container(
+                                                  padding: EdgeInsets.symmetric(
+                                                    vertical: 2,
+                                                  ),
+                                                  child: Row(
+                                                    mainAxisAlignment:
+                                                        MainAxisAlignment
+                                                            .center,
+                                                    children: [
+                                                      Icon(
+                                                        event.status ==
+                                                                "EXPIRED"
+                                                            ? Icons
+                                                                .watch_later_outlined
+                                                            : event.status ==
+                                                                'ACTIVE'
+                                                            ? Icons
+                                                                .check_circle_outline
+                                                            : Icons
+                                                                .warning_amber_rounded, // Ícono de advertencia
+                                                        color:
+                                                            event.status ==
+                                                                    "EXPIRED"
+                                                                ? Colors
+                                                                    .yellow
+                                                                    .shade900
+                                                                : event.status ==
+                                                                    'ACTIVE'
+                                                                ? Colors
+                                                                    .green
+                                                                    .shade900
+                                                                : Colors
+                                                                    .red
+                                                                    .shade900, // Color del ícono
+                                                        size:
+                                                            21.0, // Tamaño del ícono
+                                                      ),
+                                                      SizedBox(width: 4),
+                                                      Text(
+                                                        event.status == 'ACTIVE'
+                                                            ? 'CON TICKET ACTIVO'
+                                                            : event.status ==
+                                                                'EXPIRED'
+                                                            ? 'CON TICKET VENCIDO'
+                                                            : 'SIN TICKET',
+                                                        style: TextStyle(
+                                                          fontWeight:
+                                                              FontWeight.bold,
+                                                          fontSize: 12,
+                                                          color:
+                                                              event.status ==
+                                                                      "EXPIRED"
+                                                                  ? Colors
+                                                                      .yellow
+                                                                      .shade900
+                                                                  : event.status ==
+                                                                      'ACTIVE'
+                                                                  ? Colors
+                                                                      .green
+                                                                      .shade900
+                                                                  : Colors
+                                                                      .red
+                                                                      .shade900,
+                                                        ),
+                                                      ),
+                                                    ],
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                          ],
+                                        ),
                                       ),
                                     ),
-                                  ),
-                                  Expanded(
-                                    flex: 3, // 30% del espacio
-                                    child: LicensePlate(plate: event.plate),
-                                  ),
-                                ],
-                              ),
-                              Container(
-                                width: double.infinity,
-                                margin: EdgeInsets.only(top: 8),
-                                padding: EdgeInsets.symmetric(vertical: 4),
-                                decoration: BoxDecoration(
-                                  border: Border.all(
-                                    color:
-                                        event.status == 'EXPIRED'
-                                            ? Colors.yellow
-                                            : event.status == 'ACTIVE'
-                                            ? Colors.green
-                                            : Colors.red, // Color del borde
-                                    width: 1, // Ancho del borde
-                                  ),
-                                  color:
-                                      event.status == 'EXPIRED'
-                                          ? Colors.yellow.shade200
-                                          : event.status == 'ACTIVE'
-                                          ? Colors.green.shade200
-                                          : Colors
-                                              .red
-                                              .shade200, // Color de fondo del ticket
-                                  borderRadius: BorderRadius.circular(
-                                    4.0,
-                                  ), // Bordes redondeados
-                                  boxShadow: [
-                                    BoxShadow(
-                                      color: Colors.grey.withOpacity(
-                                        0.5,
-                                      ), // Sombra del ticket
-                                      spreadRadius: 1,
-                                      blurRadius: 3,
-                                      offset: Offset(
-                                        0,
-                                        1,
-                                      ), // Cambia la posición de la sombra
+                                    Expanded(
+                                      flex: 3, // 30% del espacio
+                                      child: LicensePlate(plate: event.plate),
                                     ),
                                   ],
                                 ),
-                                child: Row(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    Icon(
-                                      event.status == "EXPIRED"
-                                          ? Icons.watch_later_outlined:
-                                          event.status == 'ACTIVE'?
-                                          Icons.check_circle_outline
-                                          : Icons
-                                              .warning_amber_rounded, // Ícono de advertencia
-                                      color:
-                                          event.status == "EXPIRED"
-                                              ? Colors.yellow.shade900:
-                                          event.status == 'ACTIVE'?
-                                          Colors.green.shade900
-                                              : Colors
-                                                  .red.shade900, // Color del ícono
-                                      size: 24.0, // Tamaño del ícono
-                                    ),
-                                    SizedBox(width: 8),
-                                    Text(
-                                      event.status == 'ACTIVE'
-                                          ? 'CON TICKET ACTIVO'
-                                          : event.status == 'EXPIRED'
-                                          ? 'CON TICKET VENCIDO'
-                                          : 'SIN TICKET',
-                                      style: TextStyle(
-                                        fontWeight: FontWeight.bold,
-                                        fontSize: 14,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ],
+                              ],
+                            ),
                           ),
                         );
                       },
@@ -374,7 +419,7 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          context.push('/consult');
+          context.push('/consult/NEW');
         },
         backgroundColor: AppColors.primaryColor,
         child: Icon(Icons.check_circle, color: Colors.white),

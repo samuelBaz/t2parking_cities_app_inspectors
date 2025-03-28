@@ -1,27 +1,27 @@
-import 'package:t2parking_cities_inspector_app/models/ticket_status.dart'; // Asegúrate de que la ruta sea correcta
-
 class Ticket {
-  int id;
-  DateTime createdAt;
-  DateTime updatedAt;
-  int version;
-  String plate;
-  int duration;
-  DateTime startDate;
-  DateTime endDate;
-  String phone;
-  String email;
-  int idTicketGenerator;
-  double amount;
-  String? cause;
-  TicketStatus status; // Asegúrate de que TicketStatus esté definido
-  int companyId;
-  String companyName;
+  final int id;
+  final String createdAt;
+  final String? updatedAt;
+  final int version;
+  final String plate;
+  final int duration;
+  final String startDate;
+  final String endDate;
+  final String phone;
+  final String email;
+  final int idTicketGenerator;
+  final double amount;
+  final String? cause;
+  final String status;
+  final int companyId;
+  final int parkingAreaId;
+  final String parkingAreaName;
+  final String companyName;
 
   Ticket({
     required this.id,
     required this.createdAt,
-    required this.updatedAt,
+    this.updatedAt,
     required this.version,
     required this.plate,
     required this.duration,
@@ -31,9 +31,11 @@ class Ticket {
     required this.email,
     required this.idTicketGenerator,
     required this.amount,
-    required this.cause,
+    this.cause,
     required this.status,
     required this.companyId,
+    required this.parkingAreaId,
+    required this.parkingAreaName,
     required this.companyName,
   });
 
@@ -41,20 +43,22 @@ class Ticket {
   factory Ticket.fromJson(Map<String, dynamic> json) {
     return Ticket(
       id: json['id'],
-      createdAt: DateTime.parse(json['createdAt']),
-      updatedAt: DateTime.parse(json['updatedAt']),
+      createdAt: json['createdAt'],
+      updatedAt: json['updatedAt'],
       version: json['version'],
       plate: json['plate'],
       duration: json['duration'],
-      startDate: DateTime.parse(json['startDate']),
-      endDate: DateTime.parse(json['endDate']),
+      startDate: json['startDate'],
+      endDate: json['endDate'],
       phone: json['phone'],
       email: json['email'],
       idTicketGenerator: json['idTicketGenerator'],
-      amount: json['amount'].toDouble(),
+      amount: json['amount'],
       cause: json['cause'],
-      status: TicketStatus.values.firstWhere((e) => e.toString() == 'TicketStatus.${json['status']}'),
+      status: json['status'],
       companyId: json['companyId'],
+      parkingAreaId: json['parkingAreaId'],
+      parkingAreaName: json['parkingAreaName'],
       companyName: json['companyName'],
     );
   }
@@ -63,20 +67,22 @@ class Ticket {
   Map<String, dynamic> toJson() {
     return {
       'id': id,
-      'createdAt': createdAt.toIso8601String(),
-      'updatedAt': updatedAt.toIso8601String(),
+      'createdAt': createdAt,
+      'updatedAt': updatedAt,
       'version': version,
       'plate': plate,
       'duration': duration,
-      'startDate': startDate.toIso8601String(),
-      'endDate': endDate.toIso8601String(),
+      'startDate': startDate,
+      'endDate': endDate,
       'phone': phone,
       'email': email,
       'idTicketGenerator': idTicketGenerator,
       'amount': amount,
       'cause': cause,
-      'status': status.toString().split('.').last, // Convierte a string
+      'status': status,
       'companyId': companyId,
+      'parkingAreaId': parkingAreaId,
+      'parkingAreaName': parkingAreaName,
       'companyName': companyName,
     };
   }

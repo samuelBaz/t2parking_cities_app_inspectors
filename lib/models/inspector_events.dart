@@ -1,4 +1,5 @@
 import 'package:t2parking_cities_inspector_app/models/inspector_review.dart';
+import 'package:t2parking_cities_inspector_app/models/ticket.dart';
 
 class InspectorEvent {
   final int id;
@@ -10,6 +11,7 @@ class InspectorEvent {
   final int inspectorId;
   final String inspectorUserEmail;
   final EventReviewDto? eventReview;
+  final List<Ticket>? tickets;
   final String status;
 
   InspectorEvent({
@@ -22,6 +24,7 @@ class InspectorEvent {
     required this.inspectorId,
     required this.inspectorUserEmail,
     this.eventReview,
+    this.tickets,
     required this.status,
   });
 
@@ -36,6 +39,9 @@ class InspectorEvent {
       inspectorId: json['inspectorId'],
       inspectorUserEmail: json['inspectorUserEmail'],
       eventReview: json['eventReview'] != null ? EventReviewDto.fromJson(json['eventReview']) : null,
+      tickets: json['tickets'] != null
+          ? List<Ticket>.from(json['tickets'].map((ticket) => Ticket.fromJson(ticket)))
+          : null,
       status: json['status'],
     );
   }
