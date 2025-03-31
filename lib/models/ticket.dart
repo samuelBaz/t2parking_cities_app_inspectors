@@ -7,8 +7,8 @@ class Ticket {
   final int duration;
   final String startDate;
   final String endDate;
-  final String phone;
-  final String email;
+  final String? phone;
+  final String? email;
   final int idTicketGenerator;
   final double amount;
   final String? cause;
@@ -27,8 +27,8 @@ class Ticket {
     required this.duration,
     required this.startDate,
     required this.endDate,
-    required this.phone,
-    required this.email,
+    this.phone,
+    this.email,
     required this.idTicketGenerator,
     required this.amount,
     this.cause,
