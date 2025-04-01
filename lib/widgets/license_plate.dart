@@ -8,7 +8,7 @@ class LicensePlate extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       width: double.infinity,
-      height: 50,
+      // height: 50,
       decoration: BoxDecoration(
         color: Colors.white, // Color de fondo del contenedor
         borderRadius: BorderRadius.circular(3), // Bordes redondeados

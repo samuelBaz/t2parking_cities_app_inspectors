@@ -368,10 +368,10 @@ class _HomeScreenState extends State<HomeScreen> {
                                                       SizedBox(width: 4),
                                                       Text(
                                                         event.status == 'ACTIVE'
-                                                            ? 'CON TICKET ACTIVO'
+                                                            ? 'TICKET ACTIVO'
                                                             : event.status ==
                                                                 'EXPIRED'
-                                                            ? 'CON TICKET VENCIDO'
+                                                            ? 'TICKET VENCIDO'
                                                             : 'SIN TICKET',
                                                         style: TextStyle(
                                                           fontWeight:

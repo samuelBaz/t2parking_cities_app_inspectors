@@ -21,7 +21,7 @@ class TCTicket extends StatelessWidget {
         children: [
           Center(child: Image.asset('images/logo.png', width: 130)),
           Container(
-            width: MediaQuery.of(context).size.width * 0.5,
+            width: MediaQuery.of(context).size.width * 0.6,
             margin: EdgeInsets.only(top: 16),
             padding: EdgeInsets.symmetric(horizontal: 32),
             child: Text('Estacionamiento Tarifado'),

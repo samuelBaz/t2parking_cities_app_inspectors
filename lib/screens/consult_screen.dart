@@ -8,7 +8,6 @@ import 'package:t2parking_cities_inspector_app/constants/colors.dart';
 import 'package:t2parking_cities_inspector_app/models/inspector_events.dart';
 import 'package:t2parking_cities_inspector_app/services/api_service.dart';
 import 'package:t2parking_cities_inspector_app/utils/string_utils.dart';
-import 'package:t2parking_cities_inspector_app/widgets/license_plate.dart';
 import 'package:t2parking_cities_inspector_app/widgets/tc_button.dart';
 import 'package:t2parking_cities_inspector_app/widgets/tc_ticket.dart';
 import 'package:flutter/services.dart';
@@ -40,10 +39,10 @@ class _ConsultScreenState extends State<ConsultScreen> {
     apiService = ApiService(context: context);
     _matriculaController = TextEditingController();
 
-    if(widget.id != 'NEW'){
+    if (widget.id != 'NEW') {
       _getEventSeleted(widget.id);
     }
-    
+
     _matriculaController.text = "";
   }
 
@@ -90,7 +89,6 @@ class _ConsultScreenState extends State<ConsultScreen> {
                   Center(
                     child: Container(
                       width: MediaQuery.of(context).size.width * 0.55,
-                      height: 80,
                       decoration: BoxDecoration(
                         color: Colors.white, // Color de fondo del contenedor
                         borderRadius: BorderRadius.circular(
@@ -132,7 +130,9 @@ class _ConsultScreenState extends State<ConsultScreen> {
                               focusedBorder: InputBorder.none,
                             ),
                             inputFormatters: [
-                              FilteringTextInputFormatter.allow(RegExp(r'^[a-zA-Z0-9]*$')),
+                              FilteringTextInputFormatter.allow(
+                                RegExp(r'^[a-zA-Z0-9]*$'),
+                              ),
                             ],
                             validator: (value) {
                               if (value == null || value.isEmpty) {
@@ -141,7 +141,8 @@ class _ConsultScreenState extends State<ConsultScreen> {
                               return null;
                             },
                             onSaved: (value) {
-                              _matricula = _matriculaController.text.toUpperCase();
+                              _matricula =
+                                  _matriculaController.text.toUpperCase();
 
                               if (_matricula!.isEmpty) {
                                 setState(() {
@@ -166,165 +167,127 @@ class _ConsultScreenState extends State<ConsultScreen> {
                     },
                   ),
                   SizedBox(height: 16),
-                  _isLoading || event == null ? SizedBox():
-                  Container(
-                          margin: EdgeInsets.symmetric(
-                            vertical: 6,
-                            horizontal: 1,
-                          ),
-                          padding: EdgeInsets.all(8),
-                          decoration: BoxDecoration(
-                            color: Colors.white, // Color de fondo del ticket
-                            borderRadius: BorderRadius.circular(
-                              8.0,
-                            ), // Bordes redondeados
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.grey.withOpacity(
-                                  0.5,
-                                ), // Sombra del ticket
-                                spreadRadius: 1,
-                                blurRadius: 3,
-                                offset: Offset(
-                                  0,
-                                  1,
-                                ), // Cambia la posición de la sombra
-                              ),
-                            ],
-                          ),
+                  _isLoading || event == null
+                      ? SizedBox()
+                      : Container(
+                        margin: EdgeInsets.symmetric(
+                          vertical: 6,
+                          horizontal: 1,
+                        ),
+                        padding: EdgeInsets.all(8),
+                        decoration: BoxDecoration(
+                          color: Colors.white, // Color de fondo del ticket
+                          borderRadius: BorderRadius.circular(
+                            8.0,
+                          ), // Bordes redondeados
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.grey.withOpacity(
+                                0.5,
+                              ), // Sombra del ticket
+                              spreadRadius: 1,
+                              blurRadius: 3,
+                              offset: Offset(
+                                0,
+                                1,
+                              ), // Cambia la posición de la sombra
+                            ),
+                          ],
+                        ),
+                        child: Container(
+                          margin: EdgeInsets.only(right: 4),
                           child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Row(
                                 children: [
-                                  Expanded(
-                                    flex: 6, // 60% del espacio
-                                    child: Container(
-                                      margin: EdgeInsets.only(right: 4),
-                                      child: Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        children: [
-                                          Row(
-                                            children: [
-                                              Text(
-                                                'Fecha inspección: ',
-                                                textAlign: TextAlign.start,
-                                                style: Theme.of(
-                                                  context,
-                                                ).textTheme.bodySmall!.copyWith(
-                                                  color: Colors.black54,
-                                                  fontWeight: FontWeight.w400,
-                                                  fontSize: 12,
-                                                ),
-                                              ),
-                                              Text(
-                                                formatUtcToLocal(
-                                                  event!.createdAt,
-                                                ),
-                                                textAlign: TextAlign.start,
-                                                style: Theme.of(
-                                                  context,
-                                                ).textTheme.bodySmall!.copyWith(
-                                                  fontWeight: FontWeight.w200,
-                                                  fontSize: 11,
-                                                ),
-                                              ),
-                                            ],
-                                          ),
-                                          SizedBox(height: 2),
-                                          Row(
-                                            children: [
-                                              Text(
-                                                'Resultado: ',
-                                                textAlign: TextAlign.start,
-                                                style: Theme.of(
-                                                  context,
-                                                ).textTheme.bodySmall!.copyWith(
-                                                  color: Colors.black54,
-                                                  fontWeight: FontWeight.w400,
-                                                  fontSize: 12,
-                                                ),
-                                              ),
-                                              Container(
-                                                padding: EdgeInsets.symmetric(
-                                                  vertical: 2,
-                                                ),
-                                                child: Row(
-                                                  mainAxisAlignment:
-                                                      MainAxisAlignment.center,
-                                                  children: [
-                                                    Icon(
-                                                      event!.status == "EXPIRED"
-                                                          ? Icons
-                                                              .watch_later_outlined
-                                                          : event!.status ==
-                                                              'ACTIVE'
-                                                          ? Icons
-                                                              .check_circle_outline
-                                                          : Icons
-                                                              .warning_amber_rounded, // Ícono de advertencia
-                                                      color:
-                                                          event!.status ==
-                                                                  "EXPIRED"
-                                                              ? Colors
-                                                                  .yellow
-                                                                  .shade900
-                                                              : event!.status ==
-                                                                  'ACTIVE'
-                                                              ? Colors
-                                                                  .green
-                                                                  .shade900
-                                                              : Colors
-                                                                  .red
-                                                                  .shade900, // Color del ícono
-                                                      size:
-                                                          21.0, // Tamaño del ícono
-                                                    ),
-                                                    SizedBox(width: 4),
-                                                    Text(
-                                                      event!.status == 'ACTIVE'
-                                                          ? 'CON TICKET ACTIVO'
-                                                          : event!.status ==
-                                                              'EXPIRED'
-                                                          ? 'CON TICKET VENCIDO'
-                                                          : 'SIN TICKET',
-                                                      style: TextStyle(
-                                                        fontWeight:
-                                                            FontWeight.bold,
-                                                        fontSize: 12,
-                                                        color: event!.status ==
-                                                                  "EXPIRED"
-                                                              ? Colors
-                                                                  .yellow
-                                                                  .shade900
-                                                              : event!.status ==
-                                                                  'ACTIVE'
-                                                              ? Colors
-                                                                  .green
-                                                                  .shade900
-                                                              : Colors
-                                                                  .red
-                                                                  .shade900, 
-                                                      ),
-                                                    ),
-                                                  ],
-                                                ),
-                                              ),
-                                            ],
-                                          ),
-                                        ],
-                                      ),
+                                  Text(
+                                    'Fecha inspección: ',
+                                    textAlign: TextAlign.start,
+                                    style: Theme.of(
+                                      context,
+                                    ).textTheme.bodySmall!.copyWith(
+                                      color: Colors.black54,
+                                      fontWeight: FontWeight.w400,
+                                      fontSize: 12,
                                     ),
                                   ),
-                                  Expanded(
-                                    flex: 3, // 30% del espacio
-                                    child: LicensePlate(plate: event!.plate),
+                                  Text(
+                                    formatUtcToLocal(event!.createdAt),
+                                    textAlign: TextAlign.start,
+                                    style: Theme.of(
+                                      context,
+                                    ).textTheme.bodySmall!.copyWith(
+                                      fontWeight: FontWeight.w200,
+                                      fontSize: 11,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              SizedBox(height: 2),
+                              Row(
+                                children: [
+                                  Text(
+                                    'Resultado: ',
+                                    textAlign: TextAlign.start,
+                                    style: Theme.of(
+                                      context,
+                                    ).textTheme.bodySmall!.copyWith(
+                                      color: Colors.black54,
+                                      fontWeight: FontWeight.w400,
+                                      fontSize: 12,
+                                    ),
+                                  ),
+                                  Container(
+                                    padding: EdgeInsets.symmetric(vertical: 2),
+                                    child: Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      children: [
+                                        Icon(
+                                          event!.status == "EXPIRED"
+                                              ? Icons.watch_later_outlined
+                                              : event!.status == 'ACTIVE'
+                                              ? Icons.check_circle_outline
+                                              : Icons
+                                                  .warning_amber_rounded, // Ícono de advertencia
+                                          color:
+                                              event!.status == "EXPIRED"
+                                                  ? Colors.yellow.shade900
+                                                  : event!.status == 'ACTIVE'
+                                                  ? Colors.green.shade900
+                                                  : Colors
+                                                      .red
+                                                      .shade900, // Color del ícono
+                                          size: 21.0, // Tamaño del ícono
+                                        ),
+                                        SizedBox(width: 4),
+                                        Text(
+                                          event!.status == 'ACTIVE'
+                                              ? 'TICKET ACTIVO'
+                                              : event!.status == 'EXPIRED'
+                                              ? 'TICKET VENCIDO'
+                                              : 'SIN TICKET',
+                                          style: TextStyle(
+                                            fontWeight: FontWeight.bold,
+                                            fontSize: 12,
+                                            color:
+                                                event!.status == "EXPIRED"
+                                                    ? Colors.yellow.shade900
+                                                    : event!.status == 'ACTIVE'
+                                                    ? Colors.green.shade900
+                                                    : Colors.red.shade900,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
                                   ),
                                 ],
                               ),
                             ],
                           ),
                         ),
+                      ),
                   SizedBox(height: 16),
                   _isLoading
                       ? CircularProgressIndicator()
@@ -401,7 +364,6 @@ class _ConsultScreenState extends State<ConsultScreen> {
                   "La matrícula $_matricula no tiene ningún ticket para el día de hoy.";
             });
           }
-
         } else {
           Fluttertoast.showToast(
             msg: 'Error de consulta: ${response.statusCode} ${response.body}',
@@ -434,40 +396,29 @@ class _ConsultScreenState extends State<ConsultScreen> {
 
   void _getEventSeleted(String eventId) async {
     // if (_formKey.currentState!.validate()) {
-      // _formKey.currentState!.save();
-      setState(() {
-        _isLoading = true;
-      });
-      try {
-        final response = await apiService.get(
-          '/api/inspector_events/inspect/$eventId',
-        );
+    // _formKey.currentState!.save();
+    setState(() {
+      _isLoading = true;
+    });
+    try {
+      final response = await apiService.get(
+        '/api/inspector_events/inspect/$eventId',
+      );
 
-        if (response.statusCode == 200) {
-          final data = jsonDecode(response.body);
-          Map<String, dynamic> content = data['data'];
-          event = InspectorEvent.fromJson(content);
-          _matriculaController.text = event!.plate;
-          if (event!.tickets!.length == 0) {
-            setState(() {
-              messageResult =
-                  "La matrícula ${event!.plate} no tiene ningún ticket para el día de hoy.";
-            });
-          }
-        } else {
-          Fluttertoast.showToast(
-            msg: 'Error de consulta: ${response.statusCode} ${response.body}',
-            toastLength: Toast.LENGTH_SHORT,
-            gravity: ToastGravity.BOTTOM,
-            timeInSecForIosWeb: 1,
-            backgroundColor: Colors.red,
-            textColor: Colors.white,
-            fontSize: 16.0,
-          );
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        Map<String, dynamic> content = data['data'];
+        event = InspectorEvent.fromJson(content);
+        _matriculaController.text = event!.plate;
+        if (event!.tickets!.length == 0) {
+          setState(() {
+            messageResult =
+                "La matrícula ${event!.plate} no tiene ningún ticket para el día de hoy.";
+          });
         }
-      } catch (e) {
+      } else {
         Fluttertoast.showToast(
-          msg: 'Error: $e',
+          msg: 'Error de consulta: ${response.statusCode} ${response.body}',
           toastLength: Toast.LENGTH_SHORT,
           gravity: ToastGravity.BOTTOM,
           timeInSecForIosWeb: 1,
@@ -475,12 +426,23 @@ class _ConsultScreenState extends State<ConsultScreen> {
           textColor: Colors.white,
           fontSize: 16.0,
         );
-        // tickets = [];
-      } finally {
-        setState(() {
-          _isLoading = false;
-        });
       }
+    } catch (e) {
+      Fluttertoast.showToast(
+        msg: 'Error: $e',
+        toastLength: Toast.LENGTH_SHORT,
+        gravity: ToastGravity.BOTTOM,
+        timeInSecForIosWeb: 1,
+        backgroundColor: Colors.red,
+        textColor: Colors.white,
+        fontSize: 16.0,
+      );
+      // tickets = [];
+    } finally {
+      setState(() {
+        _isLoading = false;
+      });
+    }
     // }
   }
 }
