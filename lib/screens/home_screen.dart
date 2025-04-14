@@ -32,6 +32,12 @@ class _HomeScreenState extends State<HomeScreen> {
     _getUserPreference();
   }
 
+  @override
+  void didUpdateWidget(covariant HomeScreen oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    _getUserPreference();
+  }
+
   Future<void> _getUserPreference() async {
     final prefs = await SharedPreferences.getInstance();
     final user = prefs.getInt('user');

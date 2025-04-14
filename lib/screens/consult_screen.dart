@@ -31,6 +31,8 @@ class _ConsultScreenState extends State<ConsultScreen> {
   String messageResult = "Introduce una matrícula para ver sus tickets.";
   InspectorEvent? event;
   late final TextEditingController _matriculaController;
+  bool textFieldError = false;
+  String textError = "";
 
   @override
   void initState() {
@@ -117,6 +119,7 @@ class _ConsultScreenState extends State<ConsultScreen> {
                           TextFormField(
                             controller: _matriculaController,
                             textAlign: TextAlign.center,
+
                             style: TextStyle(fontSize: 26),
                             textCapitalization: TextCapitalization.characters,
                             decoration: InputDecoration(
@@ -134,9 +137,30 @@ class _ConsultScreenState extends State<ConsultScreen> {
                                 RegExp(r'^[a-zA-Z0-9]*$'),
                               ),
                             ],
+                            onFieldSubmitted: (String text) {
+                              _formKey.currentState!.validate();
+                            },
                             validator: (value) {
                               if (value == null || value.isEmpty) {
-                                return 'Ingresa tu matrícula';
+                                setState(() {
+                                  textFieldError = true;
+                                  textError = 'Ingresa tu matrícula';
+                                });
+                              } else if (value.length < 2) {
+                                setState(() {
+                                  textFieldError = true;
+                                  textError = 'Mínimo 2 caracteres';
+                                });
+                              } else if (value.length > 10) {
+                                setState(() {
+                                  textFieldError = true;
+                                  textError = 'Máximo 10 caracteres';
+                                });
+                              } else {
+                                setState(() {
+                                  textFieldError = false;
+                                  textError = '';
+                                });
                               }
                               return null;
                             },
@@ -153,6 +177,12 @@ class _ConsultScreenState extends State<ConsultScreen> {
                               }
                             },
                           ),
+                          textFieldError
+                              ? Text(
+                                textError,
+                                style: TextStyle(color: Colors.red, fontSize: 11),
+                              )
+                              : const SizedBox(),
                         ],
                       ),
                     ),
@@ -343,7 +373,7 @@ class _ConsultScreenState extends State<ConsultScreen> {
   }
 
   void _handleConsult() async {
-    if (_formKey.currentState!.validate()) {
+    if (_formKey.currentState!.validate() && !textFieldError) {
       _formKey.currentState!.save();
       setState(() {
         _isLoading = true;
