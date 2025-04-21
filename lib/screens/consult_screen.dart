@@ -119,7 +119,6 @@ class _ConsultScreenState extends State<ConsultScreen> {
                           TextFormField(
                             controller: _matriculaController,
                             textAlign: TextAlign.center,
-
                             style: TextStyle(fontSize: 26),
                             textCapitalization: TextCapitalization.characters,
                             decoration: InputDecoration(
@@ -136,6 +135,7 @@ class _ConsultScreenState extends State<ConsultScreen> {
                               FilteringTextInputFormatter.allow(
                                 RegExp(r'^[a-zA-Z0-9]*$'),
                               ),
+                              LengthLimitingTextInputFormatter(10), // Limita a 10 caracteres
                             ],
                             onFieldSubmitted: (String text) {
                               _formKey.currentState!.validate();
@@ -165,14 +165,12 @@ class _ConsultScreenState extends State<ConsultScreen> {
                               return null;
                             },
                             onSaved: (value) {
-                              _matricula =
-                                  _matriculaController.text.toUpperCase();
+                              _matricula = _matriculaController.text.toUpperCase();
 
                               if (_matricula!.isEmpty) {
                                 setState(() {
                                   event = null;
-                                  messageResult =
-                                      "Introduce una matrícula para ver sus tickets.";
+                                  messageResult = "Introduce una matrícula para ver sus tickets.";
                                 });
                               }
                             },
@@ -232,7 +230,7 @@ class _ConsultScreenState extends State<ConsultScreen> {
                               Row(
                                 children: [
                                   Text(
-                                    'Fecha inspección: ',
+                                    'Fecha de inspección: ',
                                     textAlign: TextAlign.start,
                                     style: Theme.of(
                                       context,
